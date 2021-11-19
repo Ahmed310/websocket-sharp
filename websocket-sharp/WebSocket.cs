@@ -2137,13 +2137,17 @@ namespace WebSocketSharp
             conf.ServerCertificateValidationCallback,
             conf.ClientCertificateSelectionCallback);
 
-          sslStream.AuthenticateAsClient (
-            host,
-            conf.ClientCertificates,
-            conf.EnabledSslProtocols,
-            conf.CheckCertificateRevocation);
-
-          _stream = sslStream;
+            // The connection couldn't be established if the certificates are empty 
+            if (conf.ClientCertificates != null)
+                sslStream.AuthenticateAsClient(
+                  host,
+                  conf.ClientCertificates,
+                  conf.EnabledSslProtocols,
+                  conf.CheckCertificateRevocation);
+            else
+                sslStream.AuthenticateAsClient(host);
+            
+           _stream = sslStream;
         }
         catch (Exception ex) {
           throw new WebSocketException (CloseStatusCode.TlsHandshakeFailure, ex);
